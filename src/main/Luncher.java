@@ -1,4 +1,7 @@
-package model;
+package main;
+
+import controller.DeveloperController;
+import model.DeveloperDAO;
 
 import java.io.IOException;
 
@@ -7,7 +10,8 @@ import java.io.IOException;
  */
 public class Luncher {
     public static void main(String[] args) throws IOException {
-        DeveloperDAO d = new DeveloperDAO();
-        d.readCommand();
+        DeveloperController c = new DeveloperController();
+
+        c.readCommand();
     }
 }

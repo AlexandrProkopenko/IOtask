@@ -1,5 +1,6 @@
 package model;
 
+
 import view.DeveloperView;
 
 import java.io.BufferedReader;
@@ -10,67 +11,73 @@ import java.io.InputStreamReader;
  * Created by Александр on 04.08.2017.
  */
 public class DeveloperDAO{
-    Developer dev1;
-    boolean exist = false;
-    String command;
+
+    public static boolean        exist      = false;
+    public static String         command;
+    Developer                    dev1       = new Developer();
+    InputStreamReader            is         = new InputStreamReader(System.in);
+    BufferedReader               br         = new BufferedReader(is);
+    DeveloperView                view       = new DeveloperView();
+
 
     void create() throws IOException {
-        InputStreamReader is = new InputStreamReader(System.in);
-        BufferedReader br = new BufferedReader(is);
-        dev1 =  new Developer();
+
+
         exist = true;
-        System.out.println("Введите имя разработчика");
-        dev1.name = br.readLine();
-        System.out.println("Введите возраст разработичика");
-        dev1.age = Integer.parseInt(br.readLine());
-        System.out.println("Разработчик мужчина?");
-        dev1.isMan = br.readLine().equals("да") ?  true : false;
-        System.out.println("Разработчик создан");
+        view.enterName();
+        String name = br.readLine();
+        view.enterAge();
+        int age=-1;
+        do {
+            try {
+               age = Integer.parseInt(br.readLine());
+            } catch (Exception e) {
+                view.enterInt();
+            }
+        }while (age == -1);
+        view.enterMan();
+        boolean isMan = br.readLine().equals("y") ?  true : false;
+        dev1 =  new Developer(age,name, isMan);
+        view.developerCreated();
     }
 
     void update() throws IOException {
         if (exist) {
-            InputStreamReader is = new InputStreamReader(System.in);
-            BufferedReader br = new BufferedReader(is);
-            System.out.println("Введите имя разработчика");
+            view.enterName();
             dev1.name = br.readLine();
-            System.out.println("Введите возраст разработичика");
-            dev1.age = Integer.parseInt(br.readLine());
-            System.out.println("Разработчик мужчина?");
+            view.enterAge();
+            int temp = dev1.age;
+            do {
+                try {
+                    dev1.age = Integer.parseInt(br.readLine());
+                } catch (Exception e) {
+                    view.enterInt();
+                }
+            }while (dev1.age == temp);
+
+            view.enterMan();
             dev1.isMan = br.readLine().equals("да") ? true : false;
-            System.out.println("Данные обновлены!");
-        }
+            view.dataUpdated();
+        }else view.devCrt();
 
     }
 
     void read(){
-    if (exist) DeveloperView.show(dev1);
+    if (exist) view.show(dev1);
+    else view.devCrt();
     }
 
     void delete(){
-        dev1 = null;
-        exist = false;
-        System.out.println("Разработчик удален, для продолжения создайте нового!");
+        if (exist) {
+            dev1 = null;
+            exist = false;
+            view.developerDeleted();
+        }
+        else view.devCrt();
     }
 
-    void readCommand() throws IOException {
-        if (!exist) {
-            System.out.println("Создайте разработчика!");
-        }
-        else
-            System.out.println("Введите команду!");
 
-        InputStreamReader is = new InputStreamReader(System.in);
-        BufferedReader br = new BufferedReader(is);
-
-
-        while (true){
-            command = br.readLine();
-            comExe();
-        }
-
-    }
-    void comExe() throws IOException {
+   public void comExe() throws IOException {
         switch  (command){
             case "new":
                 create();
@@ -89,15 +96,16 @@ public class DeveloperDAO{
                 break;
 
             case "exit":
+                br.close();
                 System.exit(0);
                 break;
-                default:
-                    System.out.println("Такой команды нет, повторите ввод!");
-                    break;
+            default:
+                view.noCommand();
+                view.showCommands();
+                break;
 
 
         }
     }
-
 
 }
